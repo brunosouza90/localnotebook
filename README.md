@@ -1,77 +1,279 @@
-# Local Notebook
+<div align="center">
+  <img src="assets/local-notebook-logo.png" alt="Local Notebook logo" width="180" />
 
-Agente de estudos em Node.js para certificacoes de IA. Ele recebe fontes, cria um RAG local, responde como tutor e gera resumos conversacionais, quizzes e simulados.
+  # Local Notebook
 
-## Stack
+  ### Your local AI study workspace for certification-driven learning.
 
-- Node.js + TypeScript + Fastify
-- SQLite local via `better-sqlite3`
-- Recuperacao lexical local, sem dependencia de vetor externo
-- Gemini via `@google/generative-ai`
-- Fallback deterministico quando `GEMINI_API_KEY` nao estiver configurada
+  **Local RAG · AI Tutor · Quizzes · Mock Exams · Node.js · TypeScript**
 
-## Arquitetura do agente
+  <p>
+    <a href="#-highlights">Highlights</a> ·
+    <a href="#-architecture">Architecture</a> ·
+    <a href="#-quick-start">Quick Start</a> ·
+    <a href="#-api">API</a> ·
+    <a href="#-roadmap">Roadmap</a> ·
+    <a href="#-authorship--brand">Authorship</a>
+  </p>
 
-A organizacao segue o modelo `research-agent` solicitado, adaptado para Node.js:
+  <p>
+    <a href="https://nodejs.org/">Node.js 20+</a>
+    ·
+    <a href="https://www.typescriptlang.org/">TypeScript</a>
+    ·
+    <a href="https://fastify.dev/">Fastify</a>
+    ·
+    <a href="https://ai.google.dev/">Gemini</a>
+  </p>
+</div>
+
+---
+
+## 🧠 What is Local Notebook?
+
+**Local Notebook** is an AI-powered study agent designed for people preparing for **AI certifications and technical exams**.
+
+Instead of treating an LLM as a generic chatbot, Local Notebook builds a **local knowledge base from your own sources**, retrieves relevant context, and uses that context to act as a tutor.
+
+It can:
+
+- 📚 ingest study material and build a local RAG knowledge base;
+- 🤖 answer questions as a context-grounded AI tutor;
+- 📝 generate conversational summaries;
+- 🧩 create quizzes by topic;
+- 🎯 simulate mock exams;
+- 🔎 preserve source metadata and retrieved chunks;
+- 🛡️ fall back to deterministic behavior when no Gemini API key is configured.
+
+> **Core principle:** the tutor should prefer retrieved evidence over unsupported model knowledge and explicitly state when evidence is insufficient.
+
+---
+
+## ✨ Highlights
+
+| Capability | Local Notebook |
+|---|---|
+| **Knowledge** | Local source ingestion + lexical retrieval |
+| **RAG** | Local-first retrieval without an external vector database |
+| **AI Tutor** | Gemini integration through `@google/generative-ai` |
+| **Assessment** | Quizzes and mock exams |
+| **Runtime** | Node.js + TypeScript + Fastify |
+| **Storage** | SQLite via `better-sqlite3` |
+| **Resilience** | Deterministic fallback without `GEMINI_API_KEY` |
+| **Developer workflow** | Custom Agent support for VS Code |
+
+---
+
+## 🏗️ Architecture
+
+The project follows a **research-agent** style organization adapted to a Node.js/TypeScript runtime:
 
 ```text
-manifest.yaml
-instructions/       identidade, comportamento e politicas
-skills/             pesquisa e analise com exemplos
-tools/              busca, banco e calculadora em TypeScript
-memory/             short_term e long_term
-prompts/templates/  pesquisa e sintese
-runtime/            orchestrator, context e policy
-evaluation/         casos, benchmarks e criterios
-observability/      configuracao de tracing
-src/                adaptadores atuais de API, RAG e Gemini
+local-notebook/
+│
+├── manifest.yaml
+├── instructions/       # identity, behavior and policies
+├── skills/             # research and analysis skills + examples
+├── tools/              # search, database and calculator tools
+├── memory/             # short_term and long_term memory
+├── prompts/templates/  # research and synthesis prompts
+├── runtime/            # orchestrator, context and policy
+├── evaluation/         # test cases, benchmarks and criteria
+├── observability/      # tracing configuration
+├── src/                # API, RAG and Gemini adapters
+└── .github/agents/     # VS Code Custom Agent integration
 ```
 
-Os arquivos pedidos como `tool.py` foram implementados como `tool.ts`, pois o runtime deste projeto e Node.js/TypeScript. O servidor usa `runtime/orchestrator.ts` como fachada para as responsabilidades do agente.
+The original `tool.py` concept is implemented as **`tool.ts`** because the runtime is Node.js/TypeScript. The main server facade is `runtime/orchestrator.ts`.
 
-## Como executar
+---
 
-1. Use Node.js 20 ou superior.
-2. Copie `.env.example` para `.env` e preencha `GEMINI_API_KEY`.
-3. Rode `npm install`.
-4. Rode `npm run dev`.
+## 🚀 Quick Start
 
-A API fica em `http://localhost:3333`.
+### Requirements
 
-Para executar a versao compilada:
+- **Node.js 20+**
+- A Gemini API key for AI-powered responses
+
+### 1. Configure the environment
+
+```bash
+cp .env.example .env
+```
+
+Then set:
+
+```env
+GEMINI_API_KEY=your_api_key_here
+```
+
+> Never commit API keys to Git, issues, logs or documentation.
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Start the development server
+
+```bash
+npm run dev
+```
+
+The API will be available at:
+
+```text
+http://localhost:3333
+```
+
+### 4. Build and run production mode
 
 ```bash
 npm run build
 npm start
 ```
 
-## Endpoints
+### 5. Ingest a local source
 
-- `POST /api/sources` com `{ "title": "...", "content": "..." }` ou `{ "title": "...", "url": "https://..." }`
-- `GET /api/sources`
-- `POST /api/ask` com `{ "question": "..." }`
-- `POST /api/quiz` com `{ "topic": "...", "count": 5 }`
-- `POST /api/mock-exam` com `{ "topic": "...", "count": 10 }`
-- `GET /health`
+```bash
+npm run ingest -- ./fonte.txt "Nome da fonte"
+```
 
-Para fontes locais: `npm run ingest -- ./fonte.txt Nome da fonte`.
+---
 
-## Publicacao e seguranca
+## 🔌 API
 
-Este projeto pode ser publicado como repositorio publico. Cada pessoa deve usar sua propria `GEMINI_API_KEY`; a chave nunca deve ser colocada no codigo, em issues, em logs ou no repositorio.
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `POST` | `/api/sources` | Add a source by content or URL |
+| `GET` | `/api/sources` | List ingested sources |
+| `POST` | `/api/ask` | Ask the tutor a question |
+| `POST` | `/api/quiz` | Generate a quiz |
+| `POST` | `/api/mock-exam` | Generate a mock exam |
+| `GET` | `/health` | Health check |
 
-Antes de publicar, siga [PUBLICATION_CHECKLIST.md](PUBLICATION_CHECKLIST.md). Consulte [SECURITY.md](SECURITY.md) para reportar vulnerabilidades, [CONTRIBUTING.md](CONTRIBUTING.md) para contribuir e [LICENSE](LICENSE) para os termos de uso.
+### Example — ask the tutor
 
-O arquivo `.github/agents/local-notebook.agent.md` permite usar o tutor como Custom Agent no VS Code, enquanto a API Node.js permite executar o agente como aplicacao independente.
+```json
+{
+  "question": "Explain the difference between RAG and fine-tuning."
+}
+```
 
-## Desenvolvimento comunitario
+### Example — generate a quiz
 
-Pull requests passam pela CI, que executa testes e build com Node.js 20. Dependabot verifica atualizacoes de dependencias semanalmente.
+```json
+{
+  "topic": "Generative AI",
+  "count": 5
+}
+```
 
-## Premissas de qualidade
+### Example — generate a mock exam
 
-O tutor deve responder apenas com contexto recuperado, citar os chunks usados e declarar quando nao houver evidencias. Fontes sao preservadas com titulo, tipo, URI, data e ordem dos chunks. A chave Gemini nunca deve ser commitada.
+```json
+{
+  "topic": "AI Architecture",
+  "count": 10
+}
+```
 
-## Evolucao recomendada
+---
 
-Para producao, substitua a busca lexical por embeddings Gemini e um indice vetorial, adicione autenticacao, observabilidade, avaliacao automatica de respostas, filtros por certificacao e um frontend separado.
+## 🎯 Quality principles
+
+Local Notebook is designed around a few non-negotiable principles:
+
+1. **Evidence first** — answers should be grounded in retrieved context.
+2. **Traceability** — retrieved chunks should be identifiable and attributable to their sources.
+3. **Honest uncertainty** — the tutor should state when evidence is missing.
+4. **Local-first architecture** — the knowledge layer does not require an external vector database.
+5. **Secret hygiene** — credentials must never be committed.
+
+---
+
+## 🧪 Development & Community
+
+The project is structured for public development:
+
+- CI runs tests and the Node.js 20 build.
+- Dependabot checks dependency updates weekly.
+- `SECURITY.md` defines the vulnerability-reporting process.
+- `CONTRIBUTING.md` defines the contribution workflow.
+- `PUBLICATION_CHECKLIST.md` provides the pre-publication checklist.
+- `LICENSE` defines the project's usage terms.
+
+---
+
+## 🗺️ Roadmap
+
+The current architecture intentionally keeps the retrieval layer simple. The recommended production evolution is:
+
+```text
+Current
+  ↓
+Local lexical retrieval
+  ↓
+Gemini-powered tutoring
+  ↓
+Quizzes + mock exams
+
+Next
+  ↓
+Gemini embeddings
+  ↓
+Vector index
+  ↓
+Authentication
+  ↓
+Observability
+  ↓
+Automated evaluation
+  ↓
+Certification-aware filters
+  ↓
+Dedicated web frontend
+```
+
+---
+
+## 👤 Authorship & Brand
+
+**Local Notebook** is an original project authored by **Bruno Rodrigues Lopes**.
+
+Author profile: [**Bruno Rodrigues Lopes | LinkedIn**](https://www.linkedin.com/in/brunolopes2/)
+
+For provenance and authorship, the project should preserve its Git history, release tags, signed commits where practical, and dated public releases. For stronger legal protection in Brazil, consider separately protecting the **brand** and the **software** through the appropriate INPI mechanisms.
+
+> **Important:** GitHub publication demonstrates public provenance, but it is not the same thing as registering a trademark. The name/logo of the project and the source code are distinct intellectual-property assets.
+
+### Brand protection
+
+For the **Local Notebook** name and logo, the appropriate route is a trademark search and, if available, a trademark application with **INPI** in the classes that correspond to the business you intend to operate. INPI states that trademark registration grants exclusive use of the registered mark in Brazil within its economic activity scope. [INPI — Marcas](https://www.gov.br/inpi/pt-br/uso-estrategico-da-pi/inpi-para-empreender-e-inovar/2-marcas)
+
+### Software authorship
+
+For the software itself, INPI provides **computer-program registration**, which can strengthen evidence of authorship or ownership in legal disputes. INPI describes the registration as a way to provide greater legal security to the software holder. [INPI — Programa de Computador](https://www.gov.br/inpi/pt-br/uso-estrategico-da-pi/inpi-para-empreender-e-inovar/3-programa-de-computador)
+
+This README is therefore intentionally explicit about project authorship, while avoiding the claim that a trademark is already registered.
+
+---
+
+## 📜 License
+
+See [LICENSE](LICENSE) for the exact terms of use.
+
+> **Commercial note:** if this project evolves into a monetized product, review the repository license and dependency licenses before offering hosted, commercial or enterprise versions.
+
+---
+
+<div align="center">
+
+### Built for people who want to learn AI by working with AI.
+
+**Local Notebook** · AI Study Agent · Local RAG · Certification Learning
+
+Made with curiosity by [Bruno Rodrigues Lopes](https://www.linkedin.com/in/brunolopes2/)
+
+</div>
