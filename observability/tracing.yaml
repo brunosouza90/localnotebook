@@ -1,0 +1,11 @@
+version: 1
+service: local notebook
+traces:
+  - name: ingest_source
+    fields: [source_id, source_type, chunks_created, duration_ms]
+  - name: retrieve_context
+    fields: [query_hash, result_count, top_score, duration_ms]
+  - name: tutor_generation
+    fields: [provider, model, grounded, citation_count, duration_ms]
+privacy:
+  redact: [GEMINI_API_KEY, authorization, content]

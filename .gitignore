@@ -1,0 +1,10 @@
+node_modules/
+dist/
+data/
+.env
+*.log
+*.js
+*.js.map
+.DS_Store
+coverage/
+npm-debug.log*

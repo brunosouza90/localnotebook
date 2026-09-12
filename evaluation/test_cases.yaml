@@ -1,0 +1,17 @@
+cases:
+  - id: grounded-answer
+    input: O que a fonte afirma sobre aprendizado supervisionado?
+    expects:
+      grounded: true
+      has_citations: true
+  - id: no-evidence
+    input: Qual e o preco atual de uma certificacao nao cadastrada?
+    expects:
+      grounded: false
+  - id: quiz-generation
+    input:
+      topic: avaliacao de modelos
+      count: 5
+    expects:
+      question_count: 5
+      has_explanation: true

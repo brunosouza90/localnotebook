@@ -1,0 +1,20 @@
+name: local notebook
+version: 0.2.0
+language: pt-BR
+runtime: nodejs
+entrypoint: src/server.ts
+purpose: Tutor de certificacoes de IA fundamentado em fontes do estudante.
+provider:
+  name: gemini
+  model_env: GEMINI_MODEL
+  api_key_env: GEMINI_API_KEY
+capabilities:
+  - ingestao de fontes textuais e URLs
+  - recuperacao de contexto para RAG
+  - tutoria socratica fundamentada
+  - resumos, quizzes e simulados
+  - citacao das evidencias utilizadas
+quality:
+  require_grounding: true
+  disclose_missing_context: true
+  persist_source_metadata: true
